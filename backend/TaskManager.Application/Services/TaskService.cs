@@ -8,29 +8,41 @@ using TaskStatus = TaskManager.Domain.Enums.TaskStatus;
 namespace TaskManager.Application.Services;
 
 public class TaskService : ITaskService {
+    private static readonly string[] AllowedSortFields = ["createdat", "duedate", "priority", "title", "status"];
+    private static readonly string[] AllowedSortDirections = ["asc", "desc"];
     private readonly ITaskRepository _taskRepository;
 
     public TaskService(ITaskRepository taskRepository) {
         _taskRepository = taskRepository;
     }
 
-    public async Task<IEnumerable<TaskResponseDto>> GetAllAsync(TaskStatus? status = null) {
-        if (status.HasValue && !Enum.IsDefined(status.Value)) {
-            throw new ArgumentException("Filtro de status inválido.");
-        }
+    public async Task<PagedResultDto<TaskResponseDto>> GetAllAsync(TaskListQueryDto query) {
+        ValidateListQuery(query);
 
         var tasks = await _taskRepository.GetAllAsync();
+        var filteredTasks = ApplyFilters(tasks, query);
+        var sortedTasks = ApplySorting(filteredTasks, query.SortBy, query.SortDirection);
 
-        if (status.HasValue) {
-            tasks = tasks.Where(task => task.Status == status.Value);
-        }
+        var totalItems = sortedTasks.Count();
+        var totalPages = (int)Math.Ceiling(totalItems / (double)query.PageSize);
 
-        return tasks.Select(MapToResponseDto);
+        var pagedItems = sortedTasks
+            .Skip((query.Page - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .Select(MapToResponseDto)
+            .ToList();
+
+        return new PagedResultDto<TaskResponseDto> {
+            Items = pagedItems,
+            Page = query.Page,
+            PageSize = query.PageSize,
+            TotalItems = totalItems,
+            TotalPages = totalPages
+        };
     }
 
     public async Task<TaskResponseDto?> GetByIdAsync(Guid id) {
         var task = await _taskRepository.GetByIdAsync(id);
-
         return task is null ? null : MapToResponseDto(task);
     }
 
@@ -53,7 +65,6 @@ public class TaskService : ITaskService {
         ValidateStatus(updateTaskDto.Status);
 
         var task = await _taskRepository.GetByIdAsync(id);
-
         if (task is null) {
             return false;
         }
@@ -72,13 +83,11 @@ public class TaskService : ITaskService {
 
     public async Task<bool> DeleteAsync(Guid id) {
         var task = await _taskRepository.GetByIdAsync(id);
-
         if (task is null) {
             return false;
         }
 
         await _taskRepository.DeleteAsync(task);
-
         return true;
     }
 
@@ -94,13 +103,71 @@ public class TaskService : ITaskService {
         };
     }
 
+    private static IEnumerable<TaskItem> ApplyFilters(IEnumerable<TaskItem> tasks, TaskListQueryDto query) {
+        var filteredTasks = tasks;
+
+        if (query.Status.HasValue) {
+            filteredTasks = filteredTasks.Where(task => task.Status == query.Status.Value);
+        }
+
+        if (query.Priority.HasValue) {
+            filteredTasks = filteredTasks.Where(task => task.Priority == query.Priority.Value);
+        }
+
+        return filteredTasks;
+    }
+
+    private static IEnumerable<TaskItem> ApplySorting(IEnumerable<TaskItem> tasks, string sortBy, string sortDirection) {
+        var normalizedSortBy = sortBy.ToLowerInvariant();
+        var isDescending = sortDirection.Equals("desc", StringComparison.OrdinalIgnoreCase);
+
+        return (normalizedSortBy, isDescending) switch {
+            ("createdat", true) => tasks.OrderByDescending(task => task.CreatedAt),
+            ("createdat", false) => tasks.OrderBy(task => task.CreatedAt),
+            ("duedate", true) => tasks.OrderByDescending(task => task.DueDate),
+            ("duedate", false) => tasks.OrderBy(task => task.DueDate),
+            ("priority", true) => tasks.OrderByDescending(task => task.Priority),
+            ("priority", false) => tasks.OrderBy(task => task.Priority),
+            ("title", true) => tasks.OrderByDescending(task => task.Title),
+            ("title", false) => tasks.OrderBy(task => task.Title),
+            ("status", true) => tasks.OrderByDescending(task => task.Status),
+            ("status", false) => tasks.OrderBy(task => task.Status),
+            _ => tasks.OrderByDescending(task => task.CreatedAt)
+        };
+    }
+
+    private static void ValidateListQuery(TaskListQueryDto query) {
+        if (query.Page < 1) {
+            throw new ArgumentException("Página deve ser maior ou igual à 1.");
+        }
+
+        if (query.PageSize < 1 || query.PageSize > 100) {
+            throw new ArgumentException("Tamanho da página deve ser de 1 até 100.");
+        }
+
+        if (!AllowedSortFields.Contains(query.SortBy.ToLowerInvariant())) {
+            throw new ArgumentException("Filtro de ordenação inválido.");
+        }
+
+        if (!AllowedSortDirections.Contains(query.SortDirection.ToLowerInvariant())) {
+            throw new ArgumentException("Direção de ordenação inválida.");
+        }
+
+        if (query.Status.HasValue) {
+            ValidateStatus(query.Status.Value);
+        }
+
+        if (query.Priority.HasValue) {
+            ValidatePriority(query.Priority.Value);
+        }
+    }
+
     private static string NormalizeTitle(string title) {
         if (string.IsNullOrWhiteSpace(title)) {
             throw new ArgumentException("Título da tarefa é obrigatório.");
         }
 
         var normalizedTitle = title.Trim();
-
         if (normalizedTitle.Length < 3 || normalizedTitle.Length > 150) {
             throw new ArgumentException("Título da tarefa deve ter de 3 a 150 caracteres.");
         }
@@ -114,7 +181,6 @@ public class TaskService : ITaskService {
         }
 
         var normalizedDescription = description.Trim();
-
         if (normalizedDescription.Length > 500) {
             throw new ArgumentException("A descrição da tarefa pode ter no máximo 500 caracteres.");
         }
@@ -128,7 +194,6 @@ public class TaskService : ITaskService {
         }
 
         var localDueDate = DateTime.SpecifyKind(dueDate.Value, DateTimeKind.Local);
-
         if (localDueDate < DateTime.Now) {
             throw new ArgumentException("Data de entrega da tarefa não pode ser retroativa.");
         }

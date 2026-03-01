@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManager.Application.DTOs;
 using TaskManager.Application.Services.Interfaces;
-using TaskStatus = TaskManager.Domain.Enums.TaskStatus;
 
 namespace TaskManager.API.Controllers;
 
@@ -15,8 +14,9 @@ public class TasksController : ControllerBase {
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TaskResponseDto>>> GetAllAsync([FromQuery] TaskStatus? status) {
-        var tasks = await _taskService.GetAllAsync(status);
+    public async Task<ActionResult<PagedResultDto<TaskResponseDto>>> GetAllAsync([FromQuery] TaskListQueryDto query) {
+        var tasks = await _taskService.GetAllAsync(query);
+
         return Ok(tasks);
     }
 
@@ -34,12 +34,14 @@ public class TasksController : ControllerBase {
     [HttpPost]
     public async Task<ActionResult<TaskResponseDto>> CreateAsync([FromBody] CreateTaskDto createTaskDto) {
         var createdTask = await _taskService.CreateAsync(createTaskDto);
+
         return CreatedAtRoute("GetTaskById", new { id = createdTask.Id }, createdTask);
     }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateTaskDto updateTaskDto) {
         var updated = await _taskService.UpdateAsync(id, updateTaskDto);
+
         return updated ? NoContent() : NotFound();
     }
 
