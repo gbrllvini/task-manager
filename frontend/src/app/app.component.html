@@ -1,7 +1,34 @@
 <main class="layout">
   <header class="topbar">
     <h1>Gerenciador de Tarefas</h1>
-    <a routerLink="/tarefas" class="link">Tarefas</a>
+
+    <ng-container *ngIf="currentUser$ | async as user; else guestActions">
+      <div class="menu-area">
+        <span class="greeting">Olá, {{ user.displayName }}!</span>
+        <button
+          type="button"
+          class="burger"
+          (click)="toggleMenu()"
+          [attr.aria-expanded]="menuOpen"
+          aria-label="Abrir menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav class="menu" *ngIf="menuOpen">
+          <button type="button" (click)="openTasks()">Tarefas</button>
+          <button type="button" class="danger" (click)="logout()" [disabled]="logoutLoading">
+            {{ logoutLoading ? "Saindo..." : "Sair" }}
+          </button>
+        </nav>
+      </div>
+    </ng-container>
+
+    <ng-template #guestActions>
+      <button type="button" class="link-btn" (click)="openLogin()">Entrar</button>
+    </ng-template>
   </header>
 
   <section class="content">

@@ -3,10 +3,13 @@
 }
 
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
+  padding: 0.95rem 1.2rem;
   color: #f8fcfd;
   background: linear-gradient(120deg, var(--brand-strong), var(--brand));
 }
@@ -14,18 +17,90 @@
 .topbar h1 {
   margin: 0;
   letter-spacing: 0.02em;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
 }
 
-.link {
-  text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.45);
+.menu-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.greeting {
+  font-size: 0.92rem;
+}
+
+.burger {
+  width: 42px;
+  height: 36px;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 8px;
-  padding: 0.35rem 0.6rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.burger span {
+  width: 18px;
+  height: 2px;
+  margin: 0 auto;
+  background: #ffffff;
+}
+
+.menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  min-width: 160px;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+}
+
+.menu button,
+.link-btn {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.48rem 0.65rem;
+  background: #fff;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu button:hover,
+.link-btn:hover {
+  background: #f2f4f8;
+}
+
+.menu .danger {
+  border-color: #f5d1ce;
+  color: #9f1f14;
 }
 
 .content {
   padding: 1rem;
   max-width: 1100px;
   margin: 0 auto;
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    padding: 0.8rem 0.9rem;
+  }
+
+  .topbar h1 {
+    font-size: 1rem;
+  }
+
+  .greeting {
+    display: none;
+  }
 }
