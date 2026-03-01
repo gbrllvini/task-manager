@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using TaskManager.API.Controllers;
@@ -11,10 +13,19 @@ namespace TaskManager.Tests.API;
 public class TasksControllerTests {
     private readonly Mock<ITaskService> _taskServiceMock;
     private readonly TasksController _tasksController;
+    private readonly Guid _userId = Guid.NewGuid();
 
     public TasksControllerTests() {
         _taskServiceMock = new Mock<ITaskService>();
         _tasksController = new TasksController(_taskServiceMock.Object);
+
+        _tasksController.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext {
+                User = new ClaimsPrincipal(new ClaimsIdentity(
+                    [new Claim(ClaimTypes.NameIdentifier, _userId.ToString())],
+                    "test-auth"))
+            }
+        };
     }
 
     [Fact]
@@ -36,7 +47,7 @@ public class TasksControllerTests {
         };
 
         _taskServiceMock
-            .Setup(service => service.GetAllAsync(It.IsAny<TaskListQueryDto>()))
+            .Setup(service => service.GetAllAsync(_userId, It.IsAny<TaskListQueryDto>()))
             .ReturnsAsync(pagedResult);
 
         var result = await _tasksController.GetAllAsync(new TaskListQueryDto());
@@ -49,7 +60,7 @@ public class TasksControllerTests {
     [Fact]
     public async Task GetByIdAsync_WhenTaskDoesNotExist_ShouldReturnNotFound() {
         _taskServiceMock
-            .Setup(service => service.GetByIdAsync(It.IsAny<Guid>()))
+            .Setup(service => service.GetByIdAsync(It.IsAny<Guid>(), _userId))
             .ReturnsAsync((TaskResponseDto?)null);
 
         var result = await _tasksController.GetByIdAsync(Guid.NewGuid());
@@ -68,7 +79,7 @@ public class TasksControllerTests {
         };
 
         _taskServiceMock
-            .Setup(service => service.CreateAsync(It.IsAny<CreateTaskDto>()))
+            .Setup(service => service.CreateAsync(_userId, It.IsAny<CreateTaskDto>()))
             .ReturnsAsync(createdTask);
 
         var result = await _tasksController.CreateAsync(new CreateTaskDto {
@@ -83,7 +94,7 @@ public class TasksControllerTests {
     [Fact]
     public async Task UpdateAsync_WhenTaskExists_ShouldReturnNoContent() {
         _taskServiceMock
-            .Setup(service => service.UpdateAsync(It.IsAny<Guid>(), It.IsAny<UpdateTaskDto>()))
+            .Setup(service => service.UpdateAsync(It.IsAny<Guid>(), _userId, It.IsAny<UpdateTaskDto>()))
             .ReturnsAsync(true);
 
         var result = await _tasksController.UpdateAsync(Guid.NewGuid(), new UpdateTaskDto {
@@ -98,7 +109,7 @@ public class TasksControllerTests {
     [Fact]
     public async Task UpdateAsync_WhenTaskDoesNotExist_ShouldReturnNotFound() {
         _taskServiceMock
-            .Setup(service => service.UpdateAsync(It.IsAny<Guid>(), It.IsAny<UpdateTaskDto>()))
+            .Setup(service => service.UpdateAsync(It.IsAny<Guid>(), _userId, It.IsAny<UpdateTaskDto>()))
             .ReturnsAsync(false);
 
         var result = await _tasksController.UpdateAsync(Guid.NewGuid(), new UpdateTaskDto {
@@ -113,7 +124,7 @@ public class TasksControllerTests {
     [Fact]
     public async Task DeleteAsync_WhenTaskExists_ShouldReturnNoContent() {
         _taskServiceMock
-            .Setup(service => service.DeleteAsync(It.IsAny<Guid>()))
+            .Setup(service => service.DeleteAsync(It.IsAny<Guid>(), _userId))
             .ReturnsAsync(true);
 
         var result = await _tasksController.DeleteAsync(Guid.NewGuid());
