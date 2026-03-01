@@ -26,6 +26,7 @@ public class ExceptionMiddleware {
         var (statusCode, title) = exception switch {
             ArgumentException => (HttpStatusCode.BadRequest, "Bad Request"),
             KeyNotFoundException => (HttpStatusCode.NotFound, "Not Found"),
+            UnauthorizedAccessException => (HttpStatusCode.Unauthorized, "Unauthorized"),
             _ => (HttpStatusCode.InternalServerError, "Internal Server Error")
         };
 
