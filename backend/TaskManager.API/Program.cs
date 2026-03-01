@@ -8,11 +8,22 @@ using TaskManager.Domain.Interfaces;
 using TaskManager.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddCors(options => {
+    options.AddPolicy("FrontendPolicy", policy => {
+        if (corsOrigins.Length == 0) {
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+            return;
+        }
+
+        policy.WithOrigins(corsOrigins).AllowAnyHeader().AllowAnyMethod();
+    });
+});
 
 builder.Services
     .AddControllers()
@@ -40,6 +51,7 @@ if (app.Environment.IsDevelopment()) {
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
+app.UseCors("FrontendPolicy");
 app.UseAuthorization();
 app.MapControllers();
 
