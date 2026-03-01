@@ -5,6 +5,7 @@ namespace TaskManager.Domain.Entities;
 
 public class TaskItem {
     public Guid Id { get; private set; }
+    public Guid UserId { get; private set; }
 
     public string Title { get; private set; } = string.Empty;
 
@@ -20,8 +21,9 @@ public class TaskItem {
 
     private TaskItem() { }
 
-    public TaskItem(string title, string? description, TaskPriority priority, DateTime? dueDate) {
+    public TaskItem(Guid userId, string title, string? description, TaskPriority priority, DateTime? dueDate) {
         Id = Guid.NewGuid();
+        UserId = userId;
         Title = title;
         Description = description;
         Priority = priority;

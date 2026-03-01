@@ -16,10 +16,10 @@ public class TaskService : ITaskService {
         _taskRepository = taskRepository;
     }
 
-    public async Task<PagedResultDto<TaskResponseDto>> GetAllAsync(TaskListQueryDto query) {
+    public async Task<PagedResultDto<TaskResponseDto>> GetAllAsync(Guid userId, TaskListQueryDto query) {
         ValidateListQuery(query);
 
-        var tasks = await _taskRepository.GetAllAsync();
+        var tasks = await _taskRepository.GetAllAsync(userId);
         var filteredTasks = ApplyFilters(tasks, query);
         var sortedTasks = ApplySorting(filteredTasks, query.SortBy, query.SortDirection);
 
@@ -41,30 +41,32 @@ public class TaskService : ITaskService {
         };
     }
 
-    public async Task<TaskResponseDto?> GetByIdAsync(Guid id) {
-        var task = await _taskRepository.GetByIdAsync(id);
+    public async Task<TaskResponseDto?> GetByIdAsync(Guid id, Guid userId) {
+        var task = await _taskRepository.GetByIdAsync(id, userId);
+
         return task is null ? null : MapToResponseDto(task);
     }
 
-    public async Task<TaskResponseDto> CreateAsync(CreateTaskDto createTaskDto) {
+    public async Task<TaskResponseDto> CreateAsync(Guid userId, CreateTaskDto createTaskDto) {
         ValidatePriority(createTaskDto.Priority);
 
         var title = NormalizeTitle(createTaskDto.Title);
         var description = NormalizeDescription(createTaskDto.Description);
         var dueDate = NormalizeDueDate(createTaskDto.DueDate);
 
-        var task = new TaskItem(title, description, createTaskDto.Priority, dueDate);
+        var task = new TaskItem(userId, title, description, createTaskDto.Priority, dueDate);
 
         await _taskRepository.AddAsync(task);
 
         return MapToResponseDto(task);
     }
 
-    public async Task<bool> UpdateAsync(Guid id, UpdateTaskDto updateTaskDto) {
+    public async Task<bool> UpdateAsync(Guid id, Guid userId, UpdateTaskDto updateTaskDto) {
         ValidatePriority(updateTaskDto.Priority);
         ValidateStatus(updateTaskDto.Status);
 
-        var task = await _taskRepository.GetByIdAsync(id);
+        var task = await _taskRepository.GetByIdAsync(id, userId);
+
         if (task is null) {
             return false;
         }
@@ -81,13 +83,15 @@ public class TaskService : ITaskService {
         return true;
     }
 
-    public async Task<bool> DeleteAsync(Guid id) {
-        var task = await _taskRepository.GetByIdAsync(id);
+    public async Task<bool> DeleteAsync(Guid id, Guid userId) {
+        var task = await _taskRepository.GetByIdAsync(id, userId);
+
         if (task is null) {
             return false;
         }
 
         await _taskRepository.DeleteAsync(task);
+
         return true;
     }
 
@@ -168,6 +172,7 @@ public class TaskService : ITaskService {
         }
 
         var normalizedTitle = title.Trim();
+
         if (normalizedTitle.Length < 3 || normalizedTitle.Length > 150) {
             throw new ArgumentException("Título da tarefa deve ter de 3 a 150 caracteres.");
         }
@@ -181,6 +186,7 @@ public class TaskService : ITaskService {
         }
 
         var normalizedDescription = description.Trim();
+
         if (normalizedDescription.Length > 500) {
             throw new ArgumentException("A descrição da tarefa pode ter no máximo 500 caracteres.");
         }

@@ -12,15 +12,16 @@ public class TaskRepository : ITaskRepository {
         _context = context;
     }
 
-    public async Task<IEnumerable<TaskItem>> GetAllAsync() {
+    public async Task<IEnumerable<TaskItem>> GetAllAsync(Guid userId) {
         return await _context.Tasks
             .AsNoTracking()
+            .Where(t => t.UserId == userId)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
     }
 
-    public async Task<TaskItem?> GetByIdAsync(Guid id) {
-        return await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id);
+    public async Task<TaskItem?> GetByIdAsync(Guid id, Guid userId) {
+        return await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
     }
 
     public async Task AddAsync(TaskItem task) {

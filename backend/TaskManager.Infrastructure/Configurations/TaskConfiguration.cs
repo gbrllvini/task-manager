@@ -13,6 +13,10 @@ public class TaskConfiguration : IEntityTypeConfiguration<TaskItem> {
         builder.Property(t => t.Id)
             .IsRequired();
 
+        builder.Property(t => t.UserId)
+            .HasColumnName("user_id")
+            .IsRequired();
+
         builder.Property(t => t.Title)
             .HasMaxLength(150)
             .IsRequired();
@@ -32,5 +36,7 @@ public class TaskConfiguration : IEntityTypeConfiguration<TaskItem> {
 
         builder.Property(t => t.CreatedAt)
             .IsRequired();
+
+        builder.HasIndex(t => t.UserId);
     }
 }
