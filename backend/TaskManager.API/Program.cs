@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Application.Services;
 using TaskManager.Application.Services.Interfaces;
+using TaskManager.API.Middlewares;
 using TaskManager.Infrastructure.Data;
 using TaskManager.Domain.Interfaces;
 using TaskManager.Infrastructure.Repositories;
@@ -23,6 +24,7 @@ if (app.Environment.IsDevelopment()) {
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

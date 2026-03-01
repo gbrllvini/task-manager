@@ -16,14 +16,8 @@ public class TasksController : ControllerBase {
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TaskResponseDto>>> GetAllAsync([FromQuery] TaskStatus? status) {
-        try {
-            var tasks = await _taskService.GetAllAsync(status);
-
-            return Ok(tasks);
-        }
-        catch (ArgumentException ex) {
-            return BadRequest(new { message = ex.Message });
-        }
+        var tasks = await _taskService.GetAllAsync(status);
+        return Ok(tasks);
     }
 
     [HttpGet("{id:guid}", Name = "GetTaskById")]
@@ -39,26 +33,14 @@ public class TasksController : ControllerBase {
 
     [HttpPost]
     public async Task<ActionResult<TaskResponseDto>> CreateAsync([FromBody] CreateTaskDto createTaskDto) {
-        try {
-            var createdTask = await _taskService.CreateAsync(createTaskDto);
-
-            return CreatedAtRoute("GetTaskById", new { id = createdTask.Id }, createdTask);
-        }
-        catch (ArgumentException ex) {
-            return BadRequest(new { message = ex.Message });
-        }
+        var createdTask = await _taskService.CreateAsync(createTaskDto);
+        return CreatedAtRoute("GetTaskById", new { id = createdTask.Id }, createdTask);
     }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateTaskDto updateTaskDto) {
-        try {
-            var updated = await _taskService.UpdateAsync(id, updateTaskDto);
-
-            return updated ? NoContent() : NotFound();
-        }
-        catch (ArgumentException ex) {
-            return BadRequest(new { message = ex.Message });
-        }
+        var updated = await _taskService.UpdateAsync(id, updateTaskDto);
+        return updated ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id:guid}")]
