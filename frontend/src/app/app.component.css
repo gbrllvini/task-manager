@@ -1,0 +1,31 @@
+.layout {
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  color: #f8fcfd;
+  background: linear-gradient(120deg, var(--brand-strong), var(--brand));
+}
+
+.topbar h1 {
+  margin: 0;
+  letter-spacing: 0.02em;
+  font-size: 1.25rem;
+}
+
+.link {
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+}
+
+.content {
+  padding: 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}

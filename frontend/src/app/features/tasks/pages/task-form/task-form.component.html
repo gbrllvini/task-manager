@@ -1,0 +1,46 @@
+<section class="card">
+  <header>
+    <h2>{{ isEditMode ? "Editar tarefa" : "Criar tarefa" }}</h2>
+  </header>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label>
+      Título
+      <input type="text" formControlName="title" />
+    </label>
+    <small class="error" *ngIf="form.controls.title.touched && form.controls.title.invalid">
+      Título é obrigatório (3-150 caracteres).
+    </small>
+
+    <label>
+      Descrição
+      <textarea rows="4" formControlName="description"></textarea>
+    </label>
+
+    <label>
+      Prioridade
+      <select formControlName="priority">
+        <option *ngFor="let priority of priorityValues" [ngValue]="priority">{{ priorityLabel(priority) }}</option>
+      </select>
+    </label>
+
+    <label *ngIf="isEditMode">
+      Status
+      <select formControlName="status">
+        <option *ngFor="let status of statusValues" [ngValue]="status">{{ statusLabel(status) }}</option>
+      </select>
+    </label>
+
+    <label>
+      Data de entrega
+      <input type="datetime-local" formControlName="dueDate" />
+    </label>
+
+    <footer class="actions">
+      <button type="button" class="secondary" (click)="cancel()">Cancelar</button>
+      <button type="submit" [disabled]="loading">{{ isEditMode ? "Salvar" : "Criar" }}</button>
+    </footer>
+  </form>
+</section>

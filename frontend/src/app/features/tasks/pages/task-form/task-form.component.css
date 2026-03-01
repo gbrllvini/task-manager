@@ -1,0 +1,61 @@
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1rem;
+  max-width: 680px;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+label {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.55rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+button {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  color: #fff;
+  cursor: pointer;
+  background: var(--brand);
+}
+
+button:hover {
+  background: var(--brand-strong);
+}
+
+.secondary {
+  color: var(--text);
+  background: #eef1f5;
+  border-color: var(--line);
+}
+
+.error {
+  color: var(--danger);
+}

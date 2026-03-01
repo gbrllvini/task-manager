@@ -1,0 +1,79 @@
+<section class="card">
+  <header class="header">
+    <h2>Tarefas</h2>
+    <button type="button" (click)="createTask()">Nova tarefa</button>
+  </header>
+
+  <section class="filters">
+    <label>
+      Status
+      <select [(ngModel)]="query.status" (change)="applyFilters()">
+        <option [ngValue]="undefined">Todos</option>
+        <option *ngFor="let status of statusValues" [ngValue]="status">{{ statusLabel(status) }}</option>
+      </select>
+    </label>
+
+    <label>
+      Prioridade
+      <select [(ngModel)]="query.priority" (change)="applyFilters()">
+        <option [ngValue]="undefined">Todas</option>
+        <option *ngFor="let priority of priorityValues" [ngValue]="priority">{{ priorityLabel(priority) }}</option>
+      </select>
+    </label>
+
+    <label>
+      Filtro
+      <select [(ngModel)]="query.sortBy" (change)="applyFilters()">
+        <option value="createdAt">Criado em</option>
+        <option value="dueDate">Data de entrega</option>
+        <option value="priority">Prioridade</option>
+        <option value="title">Título</option>
+        <option value="status">Status</option>
+      </select>
+    </label>
+
+    <label>
+      Ordenação
+      <select [(ngModel)]="query.sortDirection" (change)="applyFilters()">
+        <option value="desc">Desc</option>
+        <option value="asc">Asc</option>
+      </select>
+    </label>
+  </section>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <p *ngIf="loading">Carregando tarefas...</p>
+
+  <table *ngIf="!loading" class="table">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Prioridade</th>
+        <th>Status</th>
+        <th>Data de entrega</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let task of result.items">
+        <td>{{ task.title }}</td>
+        <td>{{ priorityLabel(task.priority) }}</td>
+        <td>{{ statusLabel(task.status) }}</td>
+        <td>{{ task.dueDate ? (task.dueDate | date: "short") : "-" }}</td>
+        <td class="actions">
+          <button type="button" (click)="editTask(task.id)">Editar</button>
+          <button type="button" class="danger" (click)="deleteTask(task.id)">Deletar</button>
+        </td>
+      </tr>
+      <tr *ngIf="result.items.length === 0">
+        <td colspan="5" class="empty">Nenhuma tarefa encontrada.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <footer class="pager">
+    <button type="button" [disabled]="result.page <= 1" (click)="changePage(result.page - 1)">Anterior</button>
+    <span>Página {{ result.page }} de {{ result.totalPages || 1 }}</span>
+    <button type="button" [disabled]="result.page >= result.totalPages" (click)="changePage(result.page + 1)">Próxima</button>
+  </footer>
+</section>
