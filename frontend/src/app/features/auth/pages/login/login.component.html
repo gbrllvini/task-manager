@@ -1,0 +1,31 @@
+<section class="auth-card">
+  <header>
+    <h2>Entrar</h2>
+    <p>Acesse sua conta para gerenciar suas tarefas.</p>
+  </header>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label>
+      Email
+      <input type="email" formControlName="email" placeholder="voce@exemplo.com" />
+    </label>
+    <small class="error" *ngIf="form.controls.email.touched && form.controls.email.invalid">Informe um email válido.</small>
+
+    <label>
+      Senha
+      <input type="password" formControlName="password" placeholder="Sua senha" />
+    </label>
+    <small class="error" *ngIf="form.controls.password.touched && form.controls.password.invalid">
+      A senha deve ter ao menos 6 caracteres.
+    </small>
+
+    <button type="submit" [disabled]="loading">{{ loading ? "Entrando..." : "Entrar" }}</button>
+  </form>
+
+  <p class="helper">
+    Não tem conta?
+    <a routerLink="/cadastro">Criar conta</a>
+  </p>
+</section>

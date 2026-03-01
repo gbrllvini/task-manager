@@ -1,0 +1,45 @@
+<section class="auth-card">
+  <header>
+    <h2>Criar conta</h2>
+    <p>Cadastre-se para organizar suas tarefas.</p>
+  </header>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label>
+      Nome
+      <input type="text" formControlName="displayName" placeholder="Seu nome" />
+    </label>
+    <small class="error" *ngIf="form.controls.displayName.touched && form.controls.displayName.invalid">
+      O nome deve ter entre 3 e 120 caracteres.
+    </small>
+
+    <label>
+      Email
+      <input type="email" formControlName="email" placeholder="voce@exemplo.com" />
+    </label>
+    <small class="error" *ngIf="form.controls.email.touched && form.controls.email.invalid">Informe um email válido.</small>
+
+    <label>
+      Senha
+      <input type="password" formControlName="password" placeholder="Crie uma senha" />
+    </label>
+    <small class="error" *ngIf="form.controls.password.touched && form.controls.password.invalid">
+      A senha deve ter ao menos 6 caracteres.
+    </small>
+
+    <label>
+      Confirmar senha
+      <input type="password" formControlName="confirmPassword" placeholder="Repita sua senha" />
+    </label>
+    <small class="error" *ngIf="form.touched && form.errors?.['passwordsMismatch']">As senhas precisam ser iguais.</small>
+
+    <button type="submit" [disabled]="loading">{{ loading ? "Criando..." : "Criar conta" }}</button>
+  </form>
+
+  <p class="helper">
+    Já tem conta?
+    <a routerLink="/login">Entrar</a>
+  </p>
+</section>

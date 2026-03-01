@@ -142,7 +142,7 @@ export class TaskFormComponent implements OnInit {
   }
 
   private navigateToList(): void {
-    void this.router.navigate(["/tasks"]);
+    void this.router.navigate(["/tarefas"]);
   }
 
   private toDateTimeLocal(value?: string | null): string {
