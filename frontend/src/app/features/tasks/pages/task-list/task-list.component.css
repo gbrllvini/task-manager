@@ -47,6 +47,42 @@
   text-align: left;
 }
 
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 92px;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.status-pending {
+  color: #3f4c5f;
+  background: #e8edf3;
+  border-color: #cdd7e2;
+}
+
+.status-in-progress {
+  color: #6b4f00;
+  background: #fff3c4;
+  border-color: #f0d575;
+}
+
+.status-completed {
+  color: #1b6a40;
+  background: #e0f4e9;
+  border-color: #9fd2b6;
+}
+
+.status-cancelled {
+  color: #9b1f14;
+  background: #fde7e5;
+  border-color: #f3b3ad;
+}
+
 .actions {
   display: flex;
   gap: 0.4rem;

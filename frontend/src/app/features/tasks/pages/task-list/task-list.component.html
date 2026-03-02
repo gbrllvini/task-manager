@@ -58,8 +58,12 @@
       <tr *ngFor="let task of result.items">
         <td>{{ task.title }}</td>
         <td>{{ priorityLabel(task.priority) }}</td>
-        <td>{{ statusLabel(task.status) }}</td>
-        <td>{{ task.dueDate ? (task.dueDate | date: "short") : "-" }}</td>
+        <td>
+          <span class="status-badge" [ngClass]="statusBadgeClass(task.status)">
+            {{ statusLabel(task.status) }}
+          </span>
+        </td>
+        <td>{{ formatDueDate(task.dueDate) }}</td>
         <td class="actions">
           <button type="button" (click)="editTask(task.id)">Editar</button>
           <button type="button" class="danger" (click)="deleteTask(task.id)">Deletar</button>

@@ -98,12 +98,51 @@ export class TaskListComponent implements OnInit {
       case TaskStatus.InProgress:
         return "Fazendo";
       case TaskStatus.Completed:
-        return "Completa";
+        return "Concluida";
       case TaskStatus.Cancelled:
         return "Cancelada";
       default:
         return "Desconhecido";
     }
+  }
+
+  protected statusBadgeClass(status: TaskStatus): string {
+    switch (status) {
+      case TaskStatus.Pending:
+        return "status-pending";
+      case TaskStatus.InProgress:
+        return "status-in-progress";
+      case TaskStatus.Completed:
+        return "status-completed";
+      case TaskStatus.Cancelled:
+        return "status-cancelled";
+      default:
+        return "status-pending";
+    }
+  }
+
+  protected formatDueDate(dueDate?: string | null): string {
+    if (!dueDate) {
+      return "-";
+    }
+
+    const parsedDate = new Date(dueDate);
+    if (Number.isNaN(parsedDate.getTime())) {
+      return "-";
+    }
+
+    const formattedDate = parsedDate.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    });
+
+    const formattedTime = parsedDate.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    return `${formattedDate} ${formattedTime}`;
   }
 
   protected priorityLabel(priority: TaskPriority): string {
