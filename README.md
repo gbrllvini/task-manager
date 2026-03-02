@@ -1,14 +1,14 @@
 # Task Manager
 
-Aplicacao fullstack de gerenciamento de tarefas com autenticacao JWT + refresh token.
+Aplicação fullstack de gerenciamento de tarefas com autenticacao JWT + refresh token.
 
 ## Funcionalidades
 
-- Cadastro e login de usuario
-- Logout da sessao atual
-- Refresh token com rotacao
+- Cadastro e login de usuário
+- Logout da sessão atual
+- Refresh token com rotação
 - CRUD de tarefas
-- Ownership: cada usuario acessa apenas as proprias tarefas
+- Ownership: cada usuario acessa apenas as próprias tarefas
 
 ## Stack
 
@@ -81,7 +81,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap.ps1 -Mode docker -W
 ## Importante: local x docker
 
 - Local e Docker podem usar bancos diferentes.
-- Nao rode local e docker ao mesmo tempo nas portas `4200` e `5134`.
+- Não rode local e docker ao mesmo tempo nas portas `4200` e `5134`.
 - Antes de voltar para local, finalize os containers:
 
 ```powershell
