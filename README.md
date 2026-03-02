@@ -1,6 +1,6 @@
 # Task Manager
 
-Aplicação fullstack de gerenciamento de tarefas com autenticacao JWT + refresh token.
+Aplicação fullstack de gerenciamento de tarefas com autenticação JWT + refresh token.
 
 ## Funcionalidades
 
