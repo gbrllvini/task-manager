@@ -35,9 +35,15 @@
   padding: 0.5rem;
 }
 
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 740px;
 }
 
 .table th,
@@ -86,6 +92,7 @@
 .actions {
   display: flex;
   gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
 button {
@@ -121,8 +128,99 @@ button:disabled {
   justify-content: flex-end;
   gap: 0.75rem;
   margin-top: 0.8rem;
+  flex-wrap: wrap;
 }
 
 .error {
   color: var(--danger);
+}
+
+@media (max-width: 820px) {
+  .header {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .header button {
+    width: 100%;
+  }
+
+  .filters {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .table-wrapper {
+    overflow: visible;
+  }
+
+  .table {
+    min-width: 0;
+    border-collapse: separate;
+    border-spacing: 0 0.6rem;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tr {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 0.6rem 0.7rem;
+    background: #fbfcfe;
+  }
+
+  .table td {
+    border: 0;
+    padding: 0.35rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .table td.actions-cell {
+    padding-top: 0.7rem;
+    margin-top: 0.3rem;
+    border-top: 1px solid var(--line);
+    justify-content: flex-end;
+  }
+
+  .table td.actions-cell::before {
+    content: "";
+    display: none;
+  }
+
+  .actions button {
+    min-width: 92px;
+  }
+
+  .empty {
+    text-align: left;
+  }
+
+  .pager {
+    justify-content: center;
+  }
 }
