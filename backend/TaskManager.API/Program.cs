@@ -17,6 +17,7 @@ using TaskManager.Infrastructure.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 var jwtOptionsSection = builder.Configuration.GetSection(JwtOptions.SectionName);
+var useHttpsRedirection = builder.Configuration.GetValue("UseHttpsRedirection", true);
 
 builder.Services.Configure<JwtOptions>(jwtOptionsSection);
 
@@ -122,12 +123,22 @@ builder.Services.AddSwaggerGen(options => {
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment()) {
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
+
+if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseHttpsRedirection();
+
+if (useHttpsRedirection) {
+    app.UseHttpsRedirection();
+}
+
 app.UseCors("FrontendPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
